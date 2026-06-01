@@ -438,11 +438,17 @@ function Footer() {
 
 /* ─── Page ─── */
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  // SSR verification — this runs on the server only
+  const serverTime = new Date().toISOString();
   return (
     <>
       <Navbar />
       <main>
+        {/* SSR check — visible in page source, proves server rendering */}
+        <div className="hidden">SSR: {serverTime}</div>
         <Hero />
         <DemoSection />
         <Features />
