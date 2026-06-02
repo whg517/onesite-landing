@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   ArrowRight,
   Sparkles,
@@ -7,7 +10,24 @@ import {
   Shield,
   Zap,
   Check,
+  Loader2,
 } from "lucide-react";
+
+/* ─── Stripe Checkout ─── */
+
+async function createCheckoutSession(
+  plan: "lite" | "pro" | "max",
+  billing: "monthly" | "annual" = "monthly",
+) {
+  const res = await fetch("/api/stripe/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ plan, billing }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Checkout failed");
+  return data.url as string;
+}
 
 /* ─── Components ─── */
 
@@ -261,9 +281,12 @@ function HowItWorks() {
 
 const plans = [
   {
+    id: "lite" as const,
     name: "Lite",
     price: "$60",
     period: "/mo",
+    annualPrice: "$600",
+    annualPeriod: "/yr",
     credits: "2,000",
     featured: false,
     cta: "Start Trial",
@@ -277,9 +300,12 @@ const plans = [
     ],
   },
   {
+    id: "pro" as const,
     name: "Pro",
     price: "$200",
     period: "/mo",
+    annualPrice: "$2,000",
+    annualPeriod: "/yr",
     credits: "8,000",
     featured: true,
     cta: "Start Trial",
@@ -295,9 +321,12 @@ const plans = [
     ],
   },
   {
+    id: "max" as const,
     name: "Max",
     price: "$600",
     period: "/mo",
+    annualPrice: "$6,000",
+    annualPeriod: "/yr",
     credits: "25,000",
     featured: false,
     cta: "Start Trial",
@@ -315,6 +344,21 @@ const plans = [
 ];
 
 function Pricing() {
+  const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
+  const [loading, setLoading] = useState<string | null>(null);
+
+  async function handleCheckout(planId: "lite" | "pro" | "max") {
+    setLoading(planId);
+    try {
+      const url = await createCheckoutSession(planId, billing);
+      window.location.assign(url);
+    } catch (err) {
+      console.error("Checkout error:", err);
+      alert("Something went wrong. Please try again.");
+      setLoading(null);
+    }
+  }
+
   return (
     <section id="pricing" className="px-6 py-32 border-t border-zinc-800/50">
       <div className="max-w-6xl mx-auto">
@@ -324,11 +368,36 @@ function Pricing() {
           </h2>
           <p className="mt-4 text-zinc-400 max-w-xl mx-auto">
             Pay for what you use. All plans include a 7-day free trial with
-            1,000 AI credits. No credit card required.
+            1,000 AI credits.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mt-16">
+        {/* billing toggle */}
+        <div className="flex items-center justify-center gap-4 mt-10">
+          <button
+            onClick={() => setBilling("monthly")}
+            className={`text-sm transition ${
+              billing === "monthly" ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setBilling("annual")}
+            className={`relative flex items-center rounded-full px-4 py-2 text-sm transition border ${
+              billing === "annual"
+                ? "border-violet-500/50 bg-violet-500/10 text-violet-300"
+                : "border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-600"
+            }`}
+          >
+            Annual
+            <span className="ml-2 text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-medium">
+              Save 17%
+            </span>
+          </button>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 mt-10">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -343,23 +412,35 @@ function Pricing() {
               )}
               <h3 className="text-xl font-semibold">{plan.name}</h3>
               <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-bold">{plan.price}</span>
-                <span className="text-zinc-400">{plan.period}</span>
+                <span className="text-4xl font-bold">
+                  {billing === "monthly" ? plan.price : plan.annualPrice}
+                </span>
+                <span className="text-zinc-400">
+                  {billing === "monthly" ? plan.period : plan.annualPeriod}
+                </span>
               </div>
               <p className="mt-2 text-sm text-zinc-400">
                 {plan.credits} AI credits/mo
               </p>
 
-              <a
-                href="#"
-                className={`mt-6 block w-full py-3 rounded-xl text-center text-sm font-semibold transition ${
+              <button
+                onClick={() => handleCheckout(plan.id)}
+                disabled={loading === plan.id}
+                className={`mt-6 w-full py-3 rounded-xl text-center text-sm font-semibold transition flex items-center justify-center gap-2 ${
                   plan.featured
                     ? "btn-glow text-white"
                     : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                }`}
+                } disabled:opacity-60 disabled:cursor-not-allowed`}
               >
-                {plan.cta}
-              </a>
+                {loading === plan.id ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Redirecting…
+                  </>
+                ) : (
+                  plan.cta
+                )}
+              </button>
 
               <ul className="mt-8 space-y-3">
                 {plan.features.map((f) => (
@@ -376,7 +457,7 @@ function Pricing() {
         <p className="text-center mt-10 text-sm text-zinc-500">
           Extra credits: <span className="text-zinc-300">$10/1,000</span> ·
           Unused credits do not roll over ·{" "}
-          <span className="text-zinc-300">17% off annual billing</span>
+          <span className="text-zinc-300">{billing === "annual" ? "17% off" : "Save 17% with annual billing"}</span>
         </p>
       </div>
     </section>
@@ -384,6 +465,20 @@ function Pricing() {
 }
 
 function CTA() {
+  const [loading, setLoading] = useState(false);
+
+  async function handleGetStarted() {
+    setLoading(true);
+    try {
+      const url = await createCheckoutSession("pro");
+      window.location.assign(url);
+    } catch (err) {
+      console.error("Checkout error:", err);
+      alert("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
+
   return (
     <section className="px-6 py-32 border-t border-zinc-800/50">
       <div className="max-w-3xl mx-auto text-center">
@@ -391,15 +486,25 @@ function CTA() {
           Ready to build your site?
         </h2>
         <p className="mt-6 text-lg text-zinc-400">
-          7-day free trial. 1,000 AI credits. No credit card.
+          7-day free trial. 1,000 AI credits.
         </p>
-        <a
-          href="#"
-          className="btn-glow inline-flex items-center gap-2 mt-10 px-10 py-4 rounded-xl text-lg font-semibold text-white"
+        <button
+          onClick={handleGetStarted}
+          disabled={loading}
+          className="btn-glow inline-flex items-center gap-2 mt-10 px-10 py-4 rounded-xl text-lg font-semibold text-white disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Get Started Free
-          <ArrowRight className="w-5 h-5" />
-        </a>
+          {loading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Redirecting…
+            </>
+          ) : (
+            <>
+              Start Free Trial
+              <ArrowRight className="w-5 h-5" />
+            </>
+          )}
+        </button>
       </div>
     </section>
   );
@@ -438,17 +543,11 @@ function Footer() {
 
 /* ─── Page ─── */
 
-export const dynamic = 'force-dynamic';
-
-export default async function Home() {
-  // SSR verification — this runs on the server only
-  const serverTime = new Date().toISOString();
+export default function Home() {
   return (
     <>
       <Navbar />
       <main>
-        {/* SSR check — visible in page source, proves server rendering */}
-        <div className="hidden">SSR: {serverTime}</div>
         <Hero />
         <DemoSection />
         <Features />
