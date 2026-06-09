@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://onesite.iclouds.work/sitemap.xml

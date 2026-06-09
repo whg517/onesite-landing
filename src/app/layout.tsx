@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://onesite.iclouds.work"),
   title: "OneSite — AI Website Builder",
   description:
     "Describe your site in natural language, get a production-ready Next.js project. Blueprint-driven AI generation with iterative refinement.",
@@ -23,12 +24,21 @@ export const metadata: Metadata = {
     url: "https://onesite.iclouds.work",
     siteName: "OneSite",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "OneSite — Describe it. Ship it.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "OneSite — AI Website Builder",
     description:
       "Describe your site in natural language, get a production-ready Next.js project.",
+    images: ["/og-image.png"],
   },
 };
 

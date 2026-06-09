@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   ArrowRight,
   Sparkles,
@@ -11,7 +11,36 @@ import {
   Zap,
   Check,
   Loader2,
+  ChevronDown,
+  Menu,
+  X,
 } from "lucide-react";
+
+/* ─── Hooks ─── */
+
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, isVisible };
+}
+
 
 /* ─── Stripe Checkout ─── */
 
@@ -32,6 +61,8 @@ async function createCheckoutSession(
 /* ─── Components ─── */
 
 function Navbar() {
+  const [open, setOpen] = useState(false);
+
   return (
     <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-xl">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -41,6 +72,8 @@ function Navbar() {
           </div>
           <span className="font-semibold text-lg">OneSite</span>
         </a>
+
+        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8 text-sm text-zinc-400">
           <a href="#features" className="hover:text-white transition">
             Features
@@ -52,24 +85,71 @@ function Navbar() {
             Pricing
           </a>
         </div>
-        <a
-          href="#pricing"
-          className="btn-glow px-4 py-2 rounded-lg text-sm font-medium text-white"
-        >
-          Start Free Trial
-        </a>
+
+        <div className="flex items-center gap-3">
+          <a
+            href="#pricing"
+            className="hidden md:inline-flex btn-glow px-4 py-2 rounded-lg text-sm font-medium text-white"
+          >
+            Start Free Trial
+          </a>
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setOpen(!open)}
+            className="md:hidden p-2 text-zinc-400 hover:text-white transition"
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="md:hidden border-t border-white/5 bg-[#09090b]/95 backdrop-blur-xl">
+          <div className="px-6 py-4 flex flex-col gap-4">
+            <a
+              href="#features"
+              onClick={() => setOpen(false)}
+              className="text-sm text-zinc-400 hover:text-white transition"
+            >
+              Features
+            </a>
+            <a
+              href="#how-it-works"
+              onClick={() => setOpen(false)}
+              className="text-sm text-zinc-400 hover:text-white transition"
+            >
+              How It Works
+            </a>
+            <a
+              href="#pricing"
+              onClick={() => setOpen(false)}
+              className="text-sm text-zinc-400 hover:text-white transition"
+            >
+              Pricing
+            </a>
+            <a
+              href="#pricing"
+              onClick={() => setOpen(false)}
+              className="btn-glow px-4 py-2 rounded-lg text-sm font-medium text-white text-center"
+            >
+              Start Free Trial
+            </a>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
 
 function Hero() {
   return (
-    <section className="relative pt-32 pb-24 px-6 overflow-hidden">
+    <section className="aurora-bg relative pt-32 pb-24 px-6 overflow-hidden">
       {/* background glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-violet-500/8 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative max-w-4xl mx-auto text-center">
+      <div className="relative z-10 max-w-4xl mx-auto text-center">
         <div className="animate-fade-up">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-medium mb-8">
             <Sparkles className="w-3.5 h-3.5" />
@@ -190,8 +270,10 @@ const features = [
 ];
 
 function Features() {
+  const { ref, isVisible } = useInView();
+
   return (
-    <section id="features" className="px-6 py-32">
+    <section id="features" className="grid-bg px-6 py-32">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold">
@@ -203,11 +285,14 @@ function Features() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          ref={ref}
+          className={`grid md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+        >
           {features.map((f) => (
             <div
               key={f.title}
-              className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition"
+              className="card-lift p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition"
             >
               <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center mb-4">
                 <f.icon className="w-5 h-5 text-violet-400" />
@@ -223,6 +308,129 @@ function Features() {
     </section>
   );
 }
+
+/* ─── Logo Cloud / Tech Stack ─── */
+
+const techStack = [
+  "Next.js",
+  "Vercel",
+  "Stripe",
+  "Tailwind CSS",
+  "TypeScript",
+  "React",
+];
+
+function LogoCloud() {
+  const { ref, isVisible } = useInView();
+
+  return (
+    <section className="px-6 py-20 border-t border-zinc-800/50">
+      <div
+        ref={ref}
+        className={`max-w-4xl mx-auto text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+      >
+        <p className="text-sm text-zinc-500 mb-8">
+          Built with technologies you already trust
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {techStack.map((tech) => (
+            <span key={tech} className="tech-badge">
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Platform Capabilities ─── */
+
+const capabilities = [
+  { label: "AI Credits", value: "1,000+", sub: "per month on Pro" },
+  { label: "Sites", value: "∞", sub: "unlimited on Max" },
+  { label: "Pages", value: "10+", sub: "per site default" },
+  { label: "AI Models", value: "4", sub: "Claude + GPT frontier" },
+];
+
+function PlatformCapabilities() {
+  const { ref, isVisible } = useInView();
+
+  return (
+    <section className="px-6 py-24 border-t border-zinc-800/50">
+      <div
+        ref={ref}
+        className={`max-w-5xl mx-auto transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+      >
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+          {capabilities.map((c) => (
+            <div key={c.label} className="text-center">
+              <div className="text-4xl md:text-5xl font-bold gradient-text">{c.value}</div>
+              <p className="mt-2 text-sm text-zinc-400">{c.label}</p>
+              <p className="mt-0.5 text-xs text-zinc-600">{c.sub}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── What Makes Us Different ─── */
+
+const differentiators = [
+  {
+    icon: Code2,
+    title: "Not a template engine",
+    description: "Every site is generated from scratch based on your description. No copy-paste layouts. No cookie-cutter designs.",
+  },
+  {
+    icon: GitBranch,
+    title: "Full code ownership",
+    description: "Export the complete Next.js project at any time. Your code, your repo, your infrastructure. No vendor lock-in.",
+  },
+  {
+    icon: Shield,
+    title: "Enterprise-grade security",
+    description: "AST-level code validation, sandboxed generation, CSP headers. Every line is scanned before it ships.",
+  },
+];
+
+function WhyOneSite() {
+  const { ref, isVisible } = useInView();
+
+  return (
+    <section className="px-6 py-32 border-t border-zinc-800/50">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Why <span className="gradient-text">OneSite</span>?
+          </h2>
+          <p className="mt-4 text-zinc-400 max-w-xl mx-auto">
+            Built for developers who want speed without sacrificing quality or control.
+          </p>
+        </div>
+
+        <div
+          ref={ref}
+          className={`grid md:grid-cols-3 gap-6 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+        >
+          {differentiators.map((d) => (
+            <div key={d.title} className="glass-card p-6">
+              <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center mb-4">
+                <d.icon className="w-5 h-5 text-violet-400" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">{d.title}</h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">{d.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── How It Works (timeline) ─── */
 
 function HowItWorks() {
   const steps = [
@@ -261,23 +469,32 @@ function HowItWorks() {
           </h2>
         </div>
 
-        <div className="space-y-12">
-          {steps.map((s) => (
-            <div key={s.num} className="flex gap-6 md:gap-10">
-              <div className="text-4xl font-bold text-zinc-800 w-12 shrink-0 text-right">
-                {s.num}
+        <div className="relative">
+          {/* timeline line */}
+          <div className="absolute left-[23px] top-10 bottom-10 w-0.5 bg-gradient-to-b from-violet-500 via-violet-500/40 to-violet-500/5 hidden md:block" />
+
+          <div className="space-y-12">
+            {steps.map((s) => (
+              <div key={s.num} className="flex gap-6 md:gap-10">
+                <div className="relative shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-sm font-bold text-violet-400">
+                    {s.num}
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <h3 className="text-xl font-semibold mb-2">{s.title}</h3>
+                  <p className="text-zinc-400 leading-relaxed">{s.description}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">{s.title}</h3>
-                <p className="text-zinc-400 leading-relaxed">{s.description}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
+/* ─── Pricing ─── */
 
 const plans = [
   {
@@ -402,7 +619,7 @@ function Pricing() {
             <div
               key={plan.name}
               className={`pricing-card rounded-2xl p-8 bg-zinc-900/50 ${
-                plan.featured ? "featured" : ""
+                plan.featured ? "featured-animated" : ""
               }`}
             >
               {plan.featured && (
@@ -464,10 +681,96 @@ function Pricing() {
   );
 }
 
+/* ─── FAQ ─── */
+
+const faqs = [
+  {
+    question: "How does the free trial work?",
+    answer:
+      "You get 7 days of full access with 1,000 AI credits. No credit card required. Build up to 3 sites during your trial. If you love it, pick a plan that fits your needs.",
+  },
+  {
+    question: "What happens to my code if I cancel?",
+    answer:
+      "Your code is always yours. Every site you generate can be exported as a complete Next.js project at any time. Cancel your subscription and your deployed sites remain live on your Vercel account.",
+  },
+  {
+    question: "Can I use my own domain?",
+    answer:
+      "Absolutely. OneSite deploys to your Vercel account, so you connect your own domain through Vercel's dashboard. We never touch your DNS or domain settings.",
+  },
+  {
+    question: "What AI models do you use?",
+    answer:
+      "We use a combination of frontier models including Claude and GPT, depending on your plan. Lite plans use GPT-5.4, Pro adds Claude Sonnet, and Max includes Claude Opus for the highest quality output.",
+  },
+  {
+    question: "Is my data secure?",
+    answer:
+      "Security is built into every layer. AI code generation runs in sandboxed environments. AST-level validation scans all output. We support CSP headers, and your code never trains our models. SOC 2 compliant.",
+  },
+];
+
+function FAQItem({ faq }: { faq: (typeof faqs)[number] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="border-b border-zinc-800">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full py-5 text-left"
+      >
+        <span className="font-medium text-sm md:text-base">{faq.question}</span>
+        <ChevronDown
+          className={`w-4 h-4 text-zinc-400 shrink-0 ml-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div
+        className="overflow-hidden transition-all duration-300"
+        style={{ maxHeight: open ? 500 : 0 }}
+      >
+        <p className="pb-5 text-sm text-zinc-400 leading-relaxed pr-8">
+          {faq.answer}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function FAQ() {
+  const { ref, isVisible } = useInView();
+
+  return (
+    <section className="px-6 py-32 border-t border-zinc-800/50">
+      <div
+        ref={ref}
+        className={`max-w-3xl mx-auto transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+      >
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Frequently asked questions
+          </h2>
+          <p className="mt-4 text-zinc-400">
+            Everything you need to know about OneSite.
+          </p>
+        </div>
+
+        <div>
+          {faqs.map((faq) => (
+            <FAQItem key={faq.question} faq={faq} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── CTA ─── */
+
 function CTA() {
   const [loading, setLoading] = useState(false);
 
-  async function handleGetStarted() {
+  const handleGetStarted = useCallback(async () => {
     setLoading(true);
     try {
       const url = await createCheckoutSession("pro");
@@ -477,11 +780,11 @@ function CTA() {
       alert("Something went wrong. Please try again.");
       setLoading(false);
     }
-  }
+  }, []);
 
   return (
-    <section className="px-6 py-32 border-t border-zinc-800/50">
-      <div className="max-w-3xl mx-auto text-center">
+    <section className="aurora-bg px-6 py-32 border-t border-zinc-800/50">
+      <div className="relative z-10 max-w-3xl mx-auto text-center">
         <h2 className="text-3xl md:text-5xl font-bold">
           Ready to build your site?
         </h2>
@@ -521,10 +824,10 @@ function Footer() {
           <span>© {new Date().getFullYear()} OneSite</span>
         </div>
         <div className="flex items-center gap-6">
-          <a href="#" className="hover:text-white transition">
+          <a href="/privacy" className="hover:text-white transition">
             Privacy
           </a>
-          <a href="#" className="hover:text-white transition">
+          <a href="/terms" className="hover:text-white transition">
             Terms
           </a>
           <a
@@ -551,8 +854,12 @@ export default function Home() {
         <Hero />
         <DemoSection />
         <Features />
+        <LogoCloud />
+        <PlatformCapabilities />
+        <WhyOneSite />
         <HowItWorks />
         <Pricing />
+        <FAQ />
         <CTA />
       </main>
       <Footer />
