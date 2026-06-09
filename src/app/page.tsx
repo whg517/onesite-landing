@@ -273,7 +273,7 @@ function Features() {
   const { ref, isVisible } = useInView();
 
   return (
-    <section id="features" className="px-6 py-32">
+    <section id="features" className="grid-bg px-6 py-32">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold">
@@ -322,7 +322,7 @@ function ProductionMetrics() {
   const { ref, isVisible } = useInView();
 
   return (
-    <section className="px-6 py-32 border-t border-zinc-800/50">
+    <section className="grid-bg px-6 py-32 border-t border-zinc-800/50">
       <div
         ref={ref}
         className={`max-w-6xl mx-auto transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
@@ -373,7 +373,7 @@ function WhyOneSite() {
   const { ref, isVisible } = useInView();
 
   return (
-    <section className="px-6 py-32 border-t border-zinc-800/50">
+    <section className="grid-bg px-6 py-32 border-t border-zinc-800/50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold">
@@ -434,7 +434,7 @@ function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" className="px-6 py-32 border-t border-zinc-800/50">
+    <section id="how-it-works" className="grid-bg px-6 py-32 border-t border-zinc-800/50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold">
@@ -554,7 +554,7 @@ function Pricing() {
   }
 
   return (
-    <section id="pricing" className="px-6 py-32 border-t border-zinc-800/50">
+    <section id="pricing" className="grid-bg px-6 py-32 border-t border-zinc-800/50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-4">
           <h2 className="text-3xl md:text-4xl font-bold">
@@ -718,7 +718,7 @@ function FAQ() {
   const { ref, isVisible } = useInView();
 
   return (
-    <section className="px-6 py-32 border-t border-zinc-800/50">
+    <section className="grid-bg px-6 py-32 border-t border-zinc-800/50">
       <div
         ref={ref}
         className={`max-w-3xl mx-auto transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
@@ -760,7 +760,7 @@ function CTA() {
   }, []);
 
   return (
-    <section className="px-6 py-32 border-t border-zinc-800/50">
+    <section className="grid-bg px-6 py-32 border-t border-zinc-800/50">
       <div className="max-w-3xl mx-auto text-center">
         <h2 className="text-3xl md:text-5xl font-bold">
           Ready to build your site?

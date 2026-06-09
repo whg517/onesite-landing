@@ -86,11 +86,7 @@ html {
     linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
   background-size: 60px 60px;
-  animation: grid-drift 20s linear infinite;
-}
-@keyframes grid-drift {
-  0% { background-position: 0 0; }
-  100% { background-position: 60px 60px; }
+  background-position: 0 0;
 }
 
 /* aurora / shimmer gradient for hero */
