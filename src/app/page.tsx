@@ -760,8 +760,8 @@ function CTA() {
   }, []);
 
   return (
-    <section className="aurora-bg px-6 py-32 border-t border-zinc-800/50">
-      <div className="relative z-10 max-w-3xl mx-auto text-center">
+    <section className="px-6 py-32 border-t border-zinc-800/50">
+      <div className="max-w-3xl mx-auto text-center">
         <h2 className="text-3xl md:text-5xl font-bold">
           Ready to build your site?
         </h2>
