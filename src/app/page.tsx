@@ -443,8 +443,8 @@ function HowItWorks() {
         </div>
 
         <div className="relative">
-          {/* timeline line */}
-          <div className="absolute left-[23px] top-10 bottom-10 w-0.5 bg-gradient-to-b from-violet-500 via-violet-500/40 to-violet-500/5 hidden md:block" />
+          {/* timeline line — runs between circles, not through them */}
+          <div className="absolute left-[23px] top-[52px] bottom-[52px] w-0.5 bg-violet-500/20 hidden md:block" />
 
           <div className="space-y-12">
             {steps.map((s) => (
