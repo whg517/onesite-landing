@@ -322,10 +322,10 @@ function ProductionMetrics() {
   const { ref, isVisible } = useInView();
 
   return (
-    <section className="px-6 py-24 border-t border-zinc-800/50">
+    <section className="px-6 py-32 border-t border-zinc-800/50">
       <div
         ref={ref}
-        className={`max-w-5xl mx-auto transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+        className={`max-w-6xl mx-auto transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
       >
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold">
