@@ -447,12 +447,16 @@ function HowItWorks() {
           <div className="absolute left-[23px] top-0 bottom-0 w-0.5 bg-violet-500/20 hidden md:block" />
 
           <div className="space-y-12">
-            {steps.map((s) => (
+            {steps.map((s, i) => (
               <div key={s.num} className="flex gap-6 md:gap-10">
                 <div className="relative shrink-0">
                   <div className="w-12 h-12 rounded-full bg-[#09090b] border-2 border-violet-500/30 flex items-center justify-center text-sm font-bold text-violet-400">
                     {s.num}
                   </div>
+                  {/* last step: mask the line below the circle */}
+                  {i === steps.length - 1 && (
+                    <div className="absolute top-12 left-0 right-0 h-12 bg-[#09090b]" />
+                  )}
                 </div>
                 <div className="pt-2">
                   <h3 className="text-xl font-semibold mb-2">{s.title}</h3>
