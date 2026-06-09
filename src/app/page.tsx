@@ -443,14 +443,14 @@ function HowItWorks() {
         </div>
 
         <div className="relative">
-          {/* timeline line — runs between circles, not through them */}
-          <div className="absolute left-[23px] top-[52px] bottom-[52px] w-0.5 bg-violet-500/20 hidden md:block" />
+          {/* timeline line — full height, circles mask it visually */}
+          <div className="absolute left-[23px] top-0 bottom-0 w-0.5 bg-violet-500/20 hidden md:block" />
 
           <div className="space-y-12">
             {steps.map((s) => (
               <div key={s.num} className="flex gap-6 md:gap-10">
                 <div className="relative shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-sm font-bold text-violet-400">
+                  <div className="w-12 h-12 rounded-full bg-[#09090b] border-2 border-violet-500/30 flex items-center justify-center text-sm font-bold text-violet-400">
                     {s.num}
                   </div>
                 </div>
