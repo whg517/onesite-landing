@@ -309,51 +309,16 @@ function Features() {
   );
 }
 
-/* ─── Logo Cloud / Tech Stack ─── */
+/* ─── Production Metrics ─── */
 
-const techStack = [
-  "Next.js",
-  "Vercel",
-  "Stripe",
-  "Tailwind CSS",
-  "TypeScript",
-  "React",
+const metrics = [
+  { value: "~15s", label: "Average build time", sub: "Describe → Deploy" },
+  { value: "85+", label: "Lighthouse score", sub: "Performance & SEO" },
+  { value: "100%", label: "Code ownership", sub: "Export anytime" },
+  { value: "0", label: "Vendor lock-in", sub: "Your repo, your infra" },
 ];
 
-function LogoCloud() {
-  const { ref, isVisible } = useInView();
-
-  return (
-    <section className="px-6 py-20 border-t border-zinc-800/50">
-      <div
-        ref={ref}
-        className={`max-w-4xl mx-auto text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-      >
-        <p className="text-sm text-zinc-500 mb-8">
-          Built with technologies you already trust
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {techStack.map((tech) => (
-            <span key={tech} className="tech-badge">
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Platform Capabilities ─── */
-
-const capabilities = [
-  { label: "AI Credits", value: "1,000+", sub: "per month on Pro" },
-  { label: "Sites", value: "∞", sub: "unlimited on Max" },
-  { label: "Pages", value: "10+", sub: "per site default" },
-  { label: "AI Models", value: "4", sub: "Claude + GPT frontier" },
-];
-
-function PlatformCapabilities() {
+function ProductionMetrics() {
   const { ref, isVisible } = useInView();
 
   return (
@@ -362,12 +327,20 @@ function PlatformCapabilities() {
         ref={ref}
         className={`max-w-5xl mx-auto transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
       >
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Production-ready, <span className="gradient-text">every time</span>
+          </h2>
+          <p className="mt-4 text-zinc-400 max-w-xl mx-auto">
+            Every site ships with performance, security, and standards baked in.
+          </p>
+        </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-          {capabilities.map((c) => (
-            <div key={c.label} className="text-center">
-              <div className="text-4xl md:text-5xl font-bold gradient-text">{c.value}</div>
-              <p className="mt-2 text-sm text-zinc-400">{c.label}</p>
-              <p className="mt-0.5 text-xs text-zinc-600">{c.sub}</p>
+          {metrics.map((m) => (
+            <div key={m.label} className="text-center">
+              <div className="text-4xl md:text-5xl font-bold gradient-text">{m.value}</div>
+              <p className="mt-2 text-sm text-zinc-400">{m.label}</p>
+              <p className="mt-0.5 text-xs text-zinc-600">{m.sub}</p>
             </div>
           ))}
         </div>
@@ -854,8 +827,7 @@ export default function Home() {
         <Hero />
         <DemoSection />
         <Features />
-        <LogoCloud />
-        <PlatformCapabilities />
+        <ProductionMetrics />
         <WhyOneSite />
         <HowItWorks />
         <Pricing />
